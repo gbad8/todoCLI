@@ -38,7 +38,7 @@ public class TaskTests
     }
 
     [Fact]
-    public void Task_Constructor_WithNullDescription_ShouldThrowArgumentNullException()
+    public void Task_Constructor_WithNullDescription_ShouldThrowArgumentException()
     {
         // Arrange
         var hash = "abc123def456";
@@ -47,7 +47,7 @@ public class TaskTests
         var createdAt = DateTime.Now;
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => 
+        Assert.Throws<ArgumentException>(() => 
             new TodoTask(hash, description, status, createdAt));
     }
 
