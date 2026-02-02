@@ -4,7 +4,7 @@
 
 ### **From Requirements & Use Cases Analysis:**
 
-#### **Substantivos Identificados (Classes Candidatas):**
+#### **Identified Nouns (Possible Classes):**
 - **Task** - Core entity with description and status
 - **Hash** - Unique identifier for tasks  
 - **Description** - Task content text
@@ -19,7 +19,7 @@
 - **Conflict** - Data inconsistency
 - **Error** - Exception conditions
 
-#### **Verbos Identificados (Métodos Candidatos):**
+#### **Identified Verbs (Possible Methods):**
 - **Add** task, **Remove** task, **List** tasks
 - **Mark** as completed, **Complete** all tasks
 - **Generate** hash, **Resolve** hash prefix

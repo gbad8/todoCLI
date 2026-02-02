@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TodoCLI.csproj" />
+    <ProjectReference Include="..\src\TodoCLI.csproj" />
   </ItemGroup>
 
 </Project>
