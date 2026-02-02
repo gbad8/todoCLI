@@ -270,8 +270,22 @@ public class MockAuthService : IAuthService
 
     public bool IsAuthenticated() => _isAuthenticated;
     public Task<string?> GetTokenAsync() => Task.FromResult(_token);
-    public Task<AuthResult> AuthenticateAsync(string token) => throw new NotImplementedException();
-    public void ClearAuthentication() => throw new NotImplementedException();
+    
+    public Task<AuthResult> AuthenticateAsync(string token) 
+    {
+        if (string.IsNullOrEmpty(token))
+            return Task.FromResult(new AuthResult { Success = false, Message = "Invalid token" });
+        
+        _isAuthenticated = true;
+        _token = token;
+        return Task.FromResult(new AuthResult { Success = true, Message = "Authentication successful" });
+    }
+    
+    public void ClearAuthentication() 
+    {
+        _isAuthenticated = false;
+        _token = null;
+    }
 }
 
 public class MockTaskService : ITaskService
@@ -292,9 +306,40 @@ public class MockTaskService : ITaskService
     
     public IEnumerable<TodoTask> ListTasks() => _tasks.AsEnumerable();
     
-    public HashResult CompleteTask(string hashPrefix) => throw new NotImplementedException();
-    public HashResult RemoveTask(string hashPrefix) => throw new NotImplementedException();
-    public void CompleteAllTasks() => throw new NotImplementedException();
+    public HashResult CompleteTask(string hashPrefix) 
+    {
+        var task = _tasks.FirstOrDefault(t => t.Hash.StartsWith(hashPrefix, StringComparison.OrdinalIgnoreCase));
+        if (task == null)
+            return new HashResult { Success = false, ErrorMessage = "Task not found" };
+
+        // Update task status
+        var index = _tasks.IndexOf(task);
+        _tasks[index] = new TodoTask(task.Hash, task.Description, TodoStatus.Completed, task.CreatedAt);
+        
+        return new HashResult { Success = true, FullHash = task.Hash };
+    }
+    
+    public HashResult RemoveTask(string hashPrefix) 
+    {
+        var task = _tasks.FirstOrDefault(t => t.Hash.StartsWith(hashPrefix, StringComparison.OrdinalIgnoreCase));
+        if (task == null)
+            return new HashResult { Success = false, ErrorMessage = "Task not found" };
+
+        _tasks.Remove(task);
+        return new HashResult { Success = true, FullHash = task.Hash };
+    }
+    
+    public void CompleteAllTasks() 
+    {
+        for (int i = 0; i < _tasks.Count; i++)
+        {
+            var task = _tasks[i];
+            if (task.Status == TodoStatus.Pending)
+            {
+                _tasks[i] = new TodoTask(task.Hash, task.Description, TodoStatus.Completed, task.CreatedAt);
+            }
+        }
+    }
     
     public void RemoveAllTasks() 
     {
