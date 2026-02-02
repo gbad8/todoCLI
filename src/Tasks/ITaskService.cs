@@ -44,4 +44,19 @@ public interface ITaskService
     /// Removes all tasks from the system.
     /// </summary>
     void RemoveAllTasks();
+
+    /// <summary>
+    /// Adds a task with existing data (for sync operations).
+    /// Preserves the original hash, status, and creation timestamp.
+    /// </summary>
+    /// <param name="task">The task to add with existing properties</param>
+    /// <returns>The added task</returns>
+    TodoTask AddExistingTask(TodoTask task);
+
+    /// <summary>
+    /// Replaces all tasks with the provided collection (for sync operations).
+    /// This is an atomic operation that clears existing tasks and adds the new ones.
+    /// </summary>
+    /// <param name="tasks">Tasks to set as the complete task list</param>
+    void SetTasks(IEnumerable<TodoTask> tasks);
 }

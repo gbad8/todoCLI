@@ -83,4 +83,22 @@ public class TaskManager : ITaskService
     {
         _tasks.Clear();
     }
+
+    public TodoTask AddExistingTask(TodoTask task)
+    {
+        if (task == null)
+            throw new ArgumentNullException(nameof(task));
+
+        _tasks.Add(task);
+        return task;
+    }
+
+    public void SetTasks(IEnumerable<TodoTask> tasks)
+    {
+        _tasks.Clear();
+        if (tasks != null)
+        {
+            _tasks.AddRange(tasks);
+        }
+    }
 }
