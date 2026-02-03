@@ -17,7 +17,7 @@ class Program
             var authService = new AuthManager(tokenStorage, gitHubClient);
             
             var hashGenerator = new HashGenerator();
-            var taskService = new TaskManager(hashGenerator);
+            var taskService = new PersistentTaskManager(hashGenerator); // ← MUDANÇA AQUI
             
             var gistClient = new HttpGistClient();
             var syncService = new SyncManager(authService, gistClient, taskService);
