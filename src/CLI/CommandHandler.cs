@@ -117,9 +117,9 @@ public class CommandHandler
 
         foreach (var task in tasks.OrderBy(t => t.CreatedAt))
         {
-            var status = task.Status == TodoStatus.Completed ? "✓" : " ";
+            var status = task.Status == TodoStatus.Completed ? "[X]" : "[ ]";
             var prefix = task.Hash[..3];
-            _console.WriteLine($"[{prefix}] {status} {task.Description}");
+            _console.WriteLine($"{prefix} {status} {task.Description}");
         }
 
         return CommandResult.Ok($"Listed {tasks.Count} tasks");

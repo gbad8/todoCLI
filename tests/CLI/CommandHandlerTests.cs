@@ -122,8 +122,8 @@ public class CommandHandlerTests
 
         // Assert
         Assert.True(result.Success);
-        Assert.Contains("[abc]   Buy groceries", mockConsole.OutputLines); // Note: espaços para status pending
-        Assert.Contains("[def] ✓ Walk the dog", mockConsole.OutputLines);
+        Assert.Contains("abc [ ] Buy groceries", mockConsole.OutputLines); // Note: [ ] para status pending
+        Assert.Contains("def [X] Walk the dog", mockConsole.OutputLines);
     }
 
     [Fact]
