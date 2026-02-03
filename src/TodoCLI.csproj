@@ -8,9 +8,9 @@
     
     <!-- NuGet Package Configuration -->
     <PackageId>TodoCLI</PackageId>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>Your Name</Authors>
-    <Description>A command-line task management tool that syncs with GitHub Gist. Now with local persistence!</Description>
+    <Description>A command-line task management tool that syncs with GitHub Gist. Now with local persistence and 24h authentication cache for optimal performance!</Description>
     <PackageProjectUrl>https://github.com/yourusername/TodoCLI</PackageProjectUrl>
     <RepositoryUrl>https://github.com/yourusername/TodoCLI.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

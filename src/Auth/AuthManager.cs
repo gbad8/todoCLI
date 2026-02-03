@@ -1,33 +1,74 @@
+using System;
+using System.IO;
+using System.Text.Json;
+using System.Threading.Tasks;
+
 namespace TodoCLI.Auth;
 
 public class AuthManager : IAuthService
 {
     private readonly ITokenStorage _tokenStorage;
     private readonly IGitHubClient _gitHubClient;
+    
+    // Cache para evitar validação HTTP desnecessária
+    private DateTime _lastValidationTime = DateTime.MinValue;
+    private bool _lastValidationResult = false;
+    private string _lastValidatedToken = "";
+    private static readonly TimeSpan CacheValidityPeriod = TimeSpan.FromDays(1);
+    
+    // Cache persistente no disco
+    private static readonly string CacheFile = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "TodoCLI", ".auth_cache");
 
     public AuthManager(ITokenStorage tokenStorage, IGitHubClient gitHubClient)
     {
         _tokenStorage = tokenStorage ?? throw new ArgumentNullException(nameof(tokenStorage));
         _gitHubClient = gitHubClient ?? throw new ArgumentNullException(nameof(gitHubClient));
+        LoadCacheFromDisk();
     }
 
     public bool IsAuthenticated()
     {
         var token = _tokenStorage.GetToken();
         if (string.IsNullOrEmpty(token))
+        {
+            _lastValidationResult = false;
             return false;
+        }
 
-        // For this simple implementation, we'll do a quick sync validation
-        // In production, we might want to cache validation results to avoid hitting the API every time
+        // Se o token mudou, cache é inválido
+        if (token != _lastValidatedToken)
+        {
+            _lastValidationTime = DateTime.MinValue;
+            _lastValidatedToken = token;
+        }
+
+        // Usar cache se ainda válido (24 horas)
+        var now = DateTime.UtcNow;
+        if (now - _lastValidationTime < CacheValidityPeriod)
+        {
+            return _lastValidationResult;
+        }
+
+        // Cache expirado - validar com GitHub API
         try
         {
             var validationTask = _gitHubClient.ValidateTokenAsync(token);
             validationTask.Wait(); // Convert async to sync for this method
-            return validationTask.Result.IsValid;
+            
+            _lastValidationResult = validationTask.Result.IsValid;
+            _lastValidationTime = now;
+            
+            // Salvar cache no disco
+            SaveCacheToDisk();
+            
+            return _lastValidationResult;
         }
         catch
         {
             // If validation fails for any reason, consider it not authenticated
+            _lastValidationResult = false;
             return false;
         }
     }
@@ -47,6 +88,15 @@ public class AuthManager : IAuthService
             {
                 // Store the valid token
                 _tokenStorage.StoreToken(token);
+                
+                // Atualizar cache com token válido
+                _lastValidatedToken = token;
+                _lastValidationResult = true;
+                _lastValidationTime = DateTime.UtcNow;
+                
+                // Salvar cache no disco
+                SaveCacheToDisk();
+                
                 return new AuthResult 
                 { 
                     Success = true, 
@@ -90,6 +140,53 @@ public class AuthManager : IAuthService
             };
         }
     }
+    
+    private void LoadCacheFromDisk()
+    {
+        try
+        {
+            if (!File.Exists(CacheFile))
+                return;
+                
+            var json = File.ReadAllText(CacheFile);
+            var cache = JsonSerializer.Deserialize<AuthCache>(json);
+            
+            if (cache != null)
+            {
+                _lastValidationTime = cache.LastValidationTime;
+                _lastValidationResult = cache.LastValidationResult;
+                _lastValidatedToken = cache.LastValidatedToken ?? "";
+            }
+        }
+        catch
+        {
+            // Se falhar ao carregar, ignora e usa valores padrão
+        }
+    }
+    
+    private void SaveCacheToDisk()
+    {
+        try
+        {
+            var directory = Path.GetDirectoryName(CacheFile);
+            if (directory != null && !Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+            
+            var cache = new AuthCache
+            {
+                LastValidationTime = _lastValidationTime,
+                LastValidationResult = _lastValidationResult,
+                LastValidatedToken = _lastValidatedToken
+            };
+            
+            var json = JsonSerializer.Serialize(cache);
+            File.WriteAllText(CacheFile, json);
+        }
+        catch
+        {
+            // Se falhar ao salvar, continua sem cache persistente
+        }
+    }
 
     public void ClearAuthentication()
     {
@@ -105,4 +202,12 @@ public class AuthManager : IAuthService
             
         return _tokenStorage.GetToken();
     }
+}
+
+// Classe auxiliar para serialização do cache
+internal class AuthCache
+{
+    public DateTime LastValidationTime { get; set; }
+    public bool LastValidationResult { get; set; }
+    public string? LastValidatedToken { get; set; }
 }
