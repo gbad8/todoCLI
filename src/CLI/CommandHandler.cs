@@ -112,7 +112,7 @@ public class CommandHandler
             return CommandResult.Ok("No tasks found");
         }
 
-        _console.WriteLine($"Found {tasks.Count} task(s):");
+        _console.WriteLine($"You have {tasks.Count} task(s):");
         _console.WriteLine("");
 
         foreach (var task in tasks.OrderBy(t => t.CreatedAt))
