@@ -269,7 +269,7 @@ public class CommandHandler
 
     private async Task<bool> EnsureAuthenticationAsync()
     {
-        if (!_authService.IsAuthenticated())
+        if (!await _authService.IsAuthenticatedAsync())
         {
             _console.WriteLine("Authentication expired. Run 'todo auth setup' to re-authenticate.");
             return false;

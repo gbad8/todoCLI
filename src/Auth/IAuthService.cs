@@ -11,7 +11,7 @@ public interface IAuthService
     /// Checks if the user is currently authenticated with valid credentials.
     /// </summary>
     /// <returns>True if authenticated with valid token, false otherwise</returns>
-    bool IsAuthenticated();
+    Task<bool> IsAuthenticatedAsync();
 
     /// <summary>
     /// Authenticates the user with a GitHub personal access token.

@@ -19,7 +19,7 @@ public class SyncManager : ISyncService
     public async Task<SyncResult> SyncAsync()
     {
         // 1. Check authentication
-        if (!_authService.IsAuthenticated())
+        if (!await _authService.IsAuthenticatedAsync())
         {
             return new SyncResult
             {

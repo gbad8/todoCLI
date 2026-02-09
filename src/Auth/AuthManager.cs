@@ -28,7 +28,7 @@ public class AuthManager : IAuthService
         LoadCacheFromDisk();
     }
 
-    public bool IsAuthenticated()
+    public async Task<bool> IsAuthenticatedAsync()
     {
         var token = _tokenStorage.GetToken();
         if (string.IsNullOrEmpty(token))
@@ -54,10 +54,9 @@ public class AuthManager : IAuthService
         // Cache expirado - validar com GitHub API
         try
         {
-            var validationTask = _gitHubClient.ValidateTokenAsync(token);
-            validationTask.Wait(); // Convert async to sync for this method
+            var validationResult = await _gitHubClient.ValidateTokenAsync(token);
             
-            _lastValidationResult = validationTask.Result.IsValid;
+            _lastValidationResult = validationResult.IsValid;
             _lastValidationTime = now;
             
             // Salvar cache no disco
@@ -195,9 +194,7 @@ public class AuthManager : IAuthService
 
     public async Task<string?> GetTokenAsync()
     {
-        await Task.CompletedTask; // Make it async-compatible
-        
-        if (!IsAuthenticated())
+        if (!await IsAuthenticatedAsync())
             return null;
             
         return _tokenStorage.GetToken();
