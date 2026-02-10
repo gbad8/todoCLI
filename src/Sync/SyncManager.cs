@@ -155,7 +155,49 @@ public class SyncManager : ISyncService
 
     public async Task<SyncResult> PushAsync()
     {
-        throw new NotImplementedException();
+        try
+        {
+            // 1. Get current authentication
+            var token = await _authService.GetTokenAsync();
+            if (string.IsNullOrEmpty(token))
+            {
+                return new SyncResult
+                {
+                    Success = false,
+                    Message = "Authentication required. Run 'todo auth setup' first."
+                };
+            }
+
+            // 2. Get current local tasks
+            var localTasks = _taskService.ListTasks();
+
+            // 3. Push local tasks to remote (overwrites remote)
+            var updateResult = await _gistClient.UpdateGistAsync(token, localTasks);
+            if (!updateResult.Success)
+            {
+                return new SyncResult
+                {
+                    Success = false,
+                    Message = $"Failed to push to remote gist: {updateResult.ErrorMessage}"
+                };
+            }
+
+            return new SyncResult
+            {
+                Success = true,
+                Message = "Tasks pushed successfully to GitHub Gist.",
+                TasksSynced = localTasks.Count(),
+                ConflictsResolved = 0
+            };
+        }
+        catch (Exception ex)
+        {
+            return new SyncResult
+            {
+                Success = false,
+                Message = $"Push failed with error: {ex.Message}"
+            };
+        }
     }
 
     public async Task<SyncResult> PullAsync()

@@ -166,6 +166,14 @@ public class CommandHandler
         if (result.Success)
         {
             _console.WriteLine($"Task removed successfully: [{result.FullHash![..3]}]");
+            
+            // Push changes to GitHub Gist (don't pull to avoid re-adding removed tasks)
+            var syncResult = await _syncService.PushAsync();
+            if (!syncResult.Success)
+            {
+                _console.WriteLine($"Warning: Task removed locally but sync failed: {syncResult.Message}");
+            }
+            
             return CommandResult.Ok("Task removed successfully");
         }
         else
@@ -210,6 +218,13 @@ public class CommandHandler
 
         _taskService.RemoveAllTasks();
         _console.WriteLine($"Removed {tasks.Count} task(s).");
+        
+        // Auto-sync with GitHub Gist
+        var syncResult = await _syncService.PushAsync();
+        if (!syncResult.Success)
+        {
+            _console.WriteLine($"Warning: Tasks removed locally but sync failed: {syncResult.Message}");
+        }
         
         return CommandResult.Ok($"Removed {tasks.Count} tasks");
     }

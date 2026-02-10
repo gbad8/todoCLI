@@ -8,7 +8,7 @@
     
     <!-- NuGet Package Configuration -->
     <PackageId>TodoCLI</PackageId>
-    <Version>1.0.10</Version>
+    <Version>1.0.12</Version>
     <Authors>Guilherme d'Almeida</Authors>
     <Description>A command-line task management tool that syncs with GitHub Gist. Features: local persistence, 24h authentication cache, improved task display format (hash [ ] task or hash [X] completed), and friendlier messages! Ready for production use.</Description>
     <PackageProjectUrl>https://github.com/gbad8/todoCLI</PackageProjectUrl>
