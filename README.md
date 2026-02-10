@@ -133,15 +133,6 @@ The project was developed using comprehensive OOA&D methodology:
 - **Architecture**: Simple Modular Design with Dependency Injection
 - **Performance**: 24h authentication cache, ~1.2s execution time
 
-## 📊 Project Statistics
-
-- **Total Lines**: 4,064 lines of code
-- **Source Code**: 1,953 lines (48%)
-- **Tests**: 1,858 lines (46%) - 79 tests with 100% success rate
-- **Documentation**: 197 lines (5%)
-- **Test Coverage**: Comprehensive TDD approach with excellent coverage
-- **Architecture**: 4 modules (Tasks, Auth, Sync, CLI) following SOLID principles
-
 ## 🧪 Testing
 
 ```bash
